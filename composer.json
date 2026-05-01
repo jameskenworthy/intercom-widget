@@ -1,0 +1,25 @@
+{
+    "name": "unified/intercom-widget",
+    "description": "Shared Intercom Messenger widget for Unified Solutions applications",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/view": "^11.0|^12.0|^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Unified\\IntercomWidget\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Unified\\IntercomWidget\\IntercomServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable"
+}
