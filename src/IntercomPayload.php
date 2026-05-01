@@ -18,33 +18,37 @@ class IntercomPayload
     ) {}
 
     /**
+     * Claims to embed in the signed JWT. Identifying / protected fields
+     * (user_id, email, name, company) live here so the browser can't
+     * tamper with them. iat/exp are added by the Widget at sign time.
+     *
      * @return array<string, mixed>
      */
-    public function toIntercomSettings(string $appId, string $apiBase, ?string $userHash): array
+    public function toJwtClaims(): array
     {
-        $settings = [
-            'api_base' => $apiBase,
-            'app_id' => $appId,
+        $claims = [
             'user_id' => (string) $this->userId,
-            'name' => $this->name,
-            'email' => $this->email,
-            'created_at' => $this->createdAt,
         ];
 
-        if ($userHash !== null) {
-            $settings['user_hash'] = $userHash;
+        if ($this->email !== null) {
+            $claims['email'] = $this->email;
+        }
+
+        if ($this->name !== null) {
+            $claims['name'] = $this->name;
+        }
+
+        if ($this->createdAt !== null) {
+            $claims['created_at'] = $this->createdAt;
         }
 
         if ($this->company !== null) {
-            $settings['company'] = array_filter(
+            $claims['company'] = array_filter(
                 $this->company,
                 static fn ($value) => $value !== null,
             );
         }
 
-        return array_filter(
-            $settings,
-            static fn ($value) => $value !== null,
-        );
+        return $claims;
     }
 }

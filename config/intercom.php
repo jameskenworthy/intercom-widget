@@ -21,21 +21,38 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Identity Verification (HMAC) secret
+    | Messenger API Secret (JWT signing key)
     |--------------------------------------------------------------------------
     |
-    | The Identity Verification secret from Intercom. When set, the
-    | server-side `user_hash` is signed and emitted in `intercomSettings`
-    | so a malicious client cannot impersonate another user_id in chat.
-    | Intercom strongly recommends turning this on for any logged-in
-    | Messenger.
+    | Intercom now authenticates Messenger users with HS256-signed JWTs
+    | instead of the legacy HMAC `user_hash` flow. The shared secret is
+    | found in your Intercom workspace at:
     |
-    | If null, the widget still loads but unverified — useful for local
-    | dev where the secret is not provisioned.
+    |   Settings > Messenger > Security > Messenger API Secret
+    |
+    | The package signs a short-lived JWT server-side per request and
+    | passes it to the browser as `intercom_user_jwt`. Identifying claims
+    | (user_id, email, company) live INSIDE the JWT so the browser can't
+    | tamper with them.
+    |
+    | Leave this null in local dev to load the Messenger unauthenticated.
     |
     */
 
-    'identity_secret' => env('INTERCOM_IDENTITY_SECRET'),
+    'jwt_secret' => env('INTERCOM_JWT_SECRET'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | JWT lifetime
+    |--------------------------------------------------------------------------
+    |
+    | How long each generated JWT stays valid. Intercom recommends a
+    | minimum of 5 minutes; 1 hour balances security with avoiding
+    | unexpected re-auth on slow networks.
+    |
+    */
+
+    'jwt_ttl_seconds' => (int) env('INTERCOM_JWT_TTL_SECONDS', 3600),
 
     /*
     |--------------------------------------------------------------------------
