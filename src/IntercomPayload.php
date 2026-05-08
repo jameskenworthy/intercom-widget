@@ -15,6 +15,7 @@ class IntercomPayload
         public readonly ?string $email,
         public readonly ?int $createdAt,
         public readonly ?array $company = null,
+        public readonly ?string $phone = null,
     ) {}
 
     /**
@@ -36,6 +37,10 @@ class IntercomPayload
 
         if ($this->name !== null) {
             $claims['name'] = $this->name;
+        }
+
+        if ($this->phone !== null) {
+            $claims['phone'] = $this->phone;
         }
 
         if ($this->createdAt !== null) {

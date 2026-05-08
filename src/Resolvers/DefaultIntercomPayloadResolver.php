@@ -57,7 +57,13 @@ class DefaultIntercomPayloadResolver implements IntercomPayloadResolver
             email: $this->stringAttribute($user, 'email'),
             createdAt: $this->timestampAttribute($user, 'created_at'),
             company: $this->resolveCompany($user),
+            phone: $this->resolvePhone($user),
         );
+    }
+
+    protected function resolvePhone(Authenticatable $user): ?string
+    {
+        return $this->stringAttribute($user, 'phone_number');
     }
 
     protected function resolveUserId(Authenticatable $user): string|int|null
