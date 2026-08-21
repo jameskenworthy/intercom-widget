@@ -1,0 +1,71 @@
+# Intercom widget — agent-oriented application intelligence.
+#
+# For support/triage agents, not customers. See /Sites/.claude/skills/app-intelligence.
+# Validate with: php /Sites/scripts/validate-app-intelligence.php /Sites/packages/unified/intercom-widget
+
+app: intercom-widget
+name: Intercom Widget (shared package)
+purpose: >
+  The support chat bubble that appears inside the Unified apps, and the piece that
+  tells support who the person chatting is and which agency they belong to. Not
+  something a customer opens on its own.
+hosting: package
+depends_on: [sso, sso-client]
+primary_users: [every customer who asks for help from inside an app]
+note: >
+  This is the channel support conversations arrive through, so a fault here is
+  self-masking — a customer who cannot open the chat usually cannot tell us that
+  they cannot open the chat. Reports arrive second-hand ("I tried to message you
+  and nothing happened"), by phone, or by email. Take them seriously even without
+  a reproduction.
+
+capabilities:
+  - id: support-chat
+    name: "Support chat"
+    aliases:
+      - chat bubble
+      - the chat
+      - message support
+      - help button
+      - can't reach support
+      - chat won't open
+      - no chat on my screen
+    what_it_does: >
+      The in-app chat where a customer can ask for help without leaving what they
+      were doing.
+    state: live
+    entry_points: [src/View, src/IntercomServiceProvider.php]
+    diagnostic_questions:
+      - "Which app and which screen were they on?"
+      - "Is the bubble missing entirely, or there but not opening?"
+      - "Are they signed in? The chat identifies them from their session."
+      - "Any ad blocker or locked-down browser? Those commonly block chat widgets."
+    known_causes:
+      - >
+        Browser extensions and agency network filtering block chat widgets fairly
+        often. Worth ruling out before treating it as a defect.
+      - >
+        The chat needs a signed-in session to identify the person. On a page
+        reached without signing in it may not appear, which can be correct.
+    related: ["sso-client:sso-login"]
+
+  - id: chat-identity
+    name: "Who support sees you as"
+    aliases: [support doesn't know who I am, wrong name in chat, wrong agency in chat]
+    what_it_does: >
+      Passes the signed-in person's identity and agency to support so a
+      conversation arrives with context instead of anonymously.
+    state: live
+    entry_points: [src/IntercomPayload.php, src/Resolvers]
+    diagnostic_questions:
+      - "Is support seeing them as the wrong person, the wrong agency, or as anonymous?"
+      - "Do they belong to more than one agency, and which is selected?"
+    known_causes:
+      - >
+        Someone belonging to several agencies is identified by the one currently
+        selected. Support seeing the "wrong" agency is usually the picker, not a
+        fault.
+      - >
+        Anonymous conversations usually mean the chat loaded on a page where the
+        person was not signed in.
+    related: ["sso:company-switching", "sso-client:user-sync"]
